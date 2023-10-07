@@ -1,38 +1,45 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "FILA.h"
+#include <time.h>
+#include "FILA.h" // Inclua o arquivo de cabeçalho da biblioteca de fila
 
 // Definição da estrutura para uma tarefa
-struct Data {
+/*struct Data {
     int dia;
     int mes;
     int ano;
-};
+}typedef data;
 
-struct tarefa {
+struct Tarefa {
     int codigo;
     char nome[30];
     char projeto[30];
-    struct Data inicio;
-    struct Data termino;
+    data inicio;
+    data termino;
     int status; // 1 para atrasada, 0 em dia, -1 pendente
-};
-typedef struct tarefa Tarefa;
+}typedef Tarefa;*/
+
+Fila* fila;
+
 
 
 // Protótipos de funções
-void adicionarTarefa(Tarefa tarefas[], int *quantidade);
-void modificarTarefa(Tarefa tarefas[], int quantidade);
-void concluirTarefa(Tarefa tarefas[], int *quantidade);
-void atualizarStatus(Tarefa tarefas[], int quantidade);
-void listarTarefasPendentes(Tarefa tarefas[], int quantidade);
-void listarTarefasConcluidas(Tarefa tarefas[], int quantidade);
-void listarTarefasAtrasadas(Tarefa tarefas[], int quantidade);
-void listarTarefasEmDia(Tarefa tarefas[], int quantidade);
+
+/*void modificarTarefa(struct Tarefa tarefas[], int quantidade);
+void concluirTarefa(struct Tarefa tarefas[], int *quantidade);
+void atualizarStatus(struct Tarefa tarefas[], int quantidade);
+void listarTarefasPendentes(struct Tarefa tarefas[], int quantidade);
+void listarTarefasConcluidas(struct Tarefa tarefas[], int quantidade);
+void listarTarefasAtrasadas(struct Tarefa tarefas[], int quantidade);
+void listarTarefasEmDia(struct Tarefa tarefas[], int quantidade);*/
 
 int main() {
-    Tarefa tarefas[100]; // Array para armazenar as tarefas
+    fila = CriaFila();
+
+    
+    Tarefa tarefa[100];
+
     int quantidadeTarefas = 0;
 
     int opcao;
@@ -54,29 +61,29 @@ int main() {
 
         switch(opcao) {
             case 1:
-                adicionarTarefa(tarefas, &quantidadeTarefas);
+                adicionarTarefa(fila, &quantidadeTarefas);
                 break;
-            case 2:
-                modificarTarefa(tarefas, quantidadeTarefas);
+            /*case 2:
+                modificarTarefa(t, quantidadeTarefas);
                 break;
             case 3:
-                concluirTarefa(tarefas, &quantidadeTarefas);
+                concluirTarefa(t, &quantidadeTarefas);
                 break;
             case 4:
-                atualizarStatus(tarefas, quantidadeTarefas);
+                atualizarStatus(t, quantidadeTarefas);
                 break;
             case 5:
-                listarTarefasPendentes(tarefas, quantidadeTarefas);
+                listarTarefasPendentes(t, quantidadeTarefas);
                 break;
             case 6:
-                listarTarefasConcluidas(tarefas, quantidadeTarefas);
+                listarTarefasConcluidas(t, quantidadeTarefas);
                 break;
             case 7:
-                listarTarefasAtrasadas(tarefas, quantidadeTarefas);
+                listarTarefasAtrasadas(t, quantidadeTarefas);
                 break;
             case 8:
-                listarTarefasEmDia(tarefas, quantidadeTarefas);
-                break;
+                listarTarefasEmDia(t, quantidadeTarefas);
+                break;*/
             case 0:
                 printf("Saindo...\n");
                 break;
@@ -88,12 +95,39 @@ int main() {
     return 0;
 }
 
-void adicionarTarefa(Tarefa tarefas[], int *quantidade) {
-    // Adicionar código para inserir uma nova tarefa
-    // Atualizar o contador de tarefas (*quantidade)
+
+
+void adicionarTarefa(Fila* fila, int* quantidade) {
+    Tarefa novaTarefa;
+    
+    // Solicite ao usuário que insira os detalhes da nova tarefa
+    printf("Digite o codigo da tarefa: ");
+    scanf("%d", &novaTarefa.codigo);
+    
+    printf("Digite o nome da tarefa: ");
+    scanf("%s", novaTarefa.nome);
+    
+    printf("Digite o nome do projeto: ");
+    scanf("%s", novaTarefa.projeto);
+    
+    printf("Digite a data de inicio (dd mm aa): ");
+    scanf("%d %d %d", &novaTarefa.inicio.dia, &novaTarefa.inicio.mes, &novaTarefa.inicio.ano);
+    
+    printf("Digite a data de termino (dd mm aa): ");
+    scanf("%d %d %d", &novaTarefa.termino.dia, &novaTarefa.termino.mes, &novaTarefa.termino.ano);
+    
+    printf("Digite o status (1 para atrasada, 0 em dia, -1 pendente): ");
+    scanf("%d", &novaTarefa.status);
+    
+    // Insira a nova tarefa na fila
+    InsereFila(fila, novaTarefa);
+    
+    // Atualize o contador de tarefas (*quantidade)
+    (*quantidade)++;
 }
 
-void modificarTarefa(Tarefa tarefas[], int quantidade) {
+
+/*void modificarTarefa(Tarefa tarefas[], int quantidade) {
     // Adicionar código para modificar uma tarefa existente
 }
 
@@ -110,14 +144,14 @@ void listarTarefasPendentes(Tarefa tarefas[], int quantidade) {
     // Adicionar código para listar tarefas pendentes
 }
 
-void listarTarefasConcluida (Tarefa tarefas[], int quantidade) {
+void listarTarefasConcluidas(Tarefa tarefas[], int quantidade) {
     // Adicionar código para listar tarefas concluídas
 }
 
-void listarTarefasAtrasadas (Tarefa tarefas[], int quantidade) {
+void listarTarefasAtrasadas(Tarefa tarefas[], int quantidade) {
     // Adicionar código para listar tarefas atrasadas
 }
 
-void listarTarefasEmDia (Tarefa tarefas[], int quantidade) {
+void listarTarefasEmDia(Tarefa tarefas[], int quantidade) {
     // Adicionar código para listar tarefas em dia
-}
+}*/
