@@ -24,6 +24,7 @@ Fila* fila;
 Fila* filaP;
 Fila* filaA;
 Fila* filaC;
+Lista* listarTarefasPendentes;
 // Protótipos de funções
 
 /*void modificarTarefa(struct Tarefa tarefas[], int quantidade);
@@ -39,7 +40,7 @@ int main() {
     filaP=CriaFila();
     filaA=CriaFila();
     filaC=CriaFila();
-
+    listarTarefasPendentes=CriaLista();
     Tarefa tarefa[100];
 
     int quantidadeTarefas = 0;
@@ -65,20 +66,19 @@ int main() {
         switch(opcao) {
             case 1:
                 adicionarTarefa(fila, &quantidadeTarefas);
+                 marcarTarefasAtrasadas(fila);
                 break;
             case 2:
-                marcarTarefasAtrasadas(fila);
                 modificarTarefa(fila);
                 break;
             case 3:
-                marcarTarefasAtrasadas(fila);
                 concluirTarefa(fila,filaC);
                 break;
             case 4:
                 atualizarStatus(fila);
                 break;
             case 5:
-                listarTarefasPendentes(fila, filaP);
+                TarefasPendentes(filaP);
                 break;
             case 6:
                 listarTarefasConcluidas(filaC);
@@ -118,10 +118,10 @@ void adicionarTarefa(Fila* fila, int* quantidade) {
     printf("Digite o nome do projeto: ");
     scanf("%s", novaTarefa.projeto);
 
-    printf("Digite a data de inicio (dd mm aa): ");
+    printf("Digite a data de inicio (dd mm aaaa): ");
     scanf("%d %d %d", &novaTarefa.inicio.dia, &novaTarefa.inicio.mes, &novaTarefa.inicio.ano);
 
-    printf("Digite a data de termino (dd mm aa): ");
+    printf("Digite a data de termino (dd mm aaaa): ");
     scanf("%d %d %d", &novaTarefa.termino.dia, &novaTarefa.termino.mes, &novaTarefa.termino.ano);
 
     printf("Digite o status (1 para atrasada, 0 em dia, -1 pendente): ");
@@ -183,7 +183,7 @@ void marcarTarefasAtrasadas(Fila* fila) {
     No* atual = fila->ini;
 
     while (atual != NULL) {
-        if (atual->info.status != 0) { // Verifique se a tarefa não está concluída
+
             // Converta as datas de término da tarefa e a data atual para structs tm
             struct tm* dataTermino;
             dataTermino = localtime(&agora);
@@ -197,7 +197,7 @@ void marcarTarefasAtrasadas(Fila* fila) {
                 // A tarefa está atrasada, marque como atrasada (status 1)
                 atual->info.status = 1;
             }
-        }
+
         atual = atual->prox;
     }
 }
@@ -222,13 +222,10 @@ void concluirTarefa(Fila* fila, Fila* filaC) {
             encontrou = 1;
 
             // Verifique se a tarefa está atrasada
-            if (atual->info.status != 0) {
                 // A tarefa não está concluída, mova-a para a fila de tarefas concluídas
                 InsereFila(filaC, atual->info);
-                printf("Tarefa movida para a fila de concluídas.\n");
-            } else {
-                printf("Tarefa com codigo %d ja esta concluida.\n", codigo);
-            }
+                printf("Tarefa Concluida .\n");
+
 
             // Remova a tarefa da fila
             if (anterior == NULL) {
@@ -252,7 +249,7 @@ void concluirTarefa(Fila* fila, Fila* filaC) {
 
 
 
-void atualizarStatus(Fila* fila) {
+void atualizarStatus(Fila* fila, Lista* listaPendentes) {
     int codigo, novoStatus;
 
     // Solicite ao usuário o código da tarefa que deseja modificar o status
@@ -274,6 +271,22 @@ void atualizarStatus(Fila* fila) {
             // Atualize o status da tarefa
             atual->info.status = novoStatus;
 
+            // Verifique se a tarefa se tornou pendente
+            if (novoStatus == -1) {
+                // Mova a tarefa para a lista de tarefas pendentes
+                InsereLista(listaPendentes, atual->info);
+                No* temp = atual;
+                atual = atual->prox;
+                free(temp);
+
+                // Atualize a fila principal
+                if (temp == fila->ini) {
+                    fila->ini = atual;
+                }
+            } else {
+                atual = atual->prox;
+            }
+
             printf("Status da tarefa atualizado com sucesso!\n");
             break;
         }
@@ -284,9 +297,8 @@ void atualizarStatus(Fila* fila) {
         printf("Tarefa com codigo %d nao encontrada.\n", codigo);
     }
 }
+void TarefasPendentes(Fila*filaP){
 
-
-void listarTarefasPendentes(Fila* fila) {
     printf("Tarefas Pendentes:\n");
     No* atual = fila->ini;
     while (atual != NULL) {
