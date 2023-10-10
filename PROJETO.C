@@ -48,6 +48,7 @@ int main() {
     int opcao;
 
     do {
+
         // Mostra o menu de opções
         printf("\nMenu de Opcoes:\n");
         printf("1. Adicionar Tarefa\n");
@@ -56,9 +57,8 @@ int main() {
         printf("4. Atualizar Status\n");
         printf("5. Listar Tarefas Pendentes\n");
         printf("6. Listar Tarefas Concluidas\n");
-        printf("7. Listar Tarefas Atrasadas\n");
-        printf("8. Listar Tarefas em Dia\n");
-        printf("9. Listar Todas as Tarefas\n");
+        printf("7. Listar Tarefas Concluidas com e sem atraso\n");
+        printf("8. Listar Todas as Tarefas\n");
         printf("0. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
@@ -75,21 +75,18 @@ int main() {
                 concluirTarefa(fila,filaC);
                 break;
             case 4:
-                atualizarStatus(fila);
+                atualizarStatus(fila,listarTarefasPendentes);
                 break;
             case 5:
-                TarefasPendentes(filaP);
+                TarefasPendentes(fila,listarTarefasPendentes);
                 break;
             case 6:
                 listarTarefasConcluidas(filaC);
                 break;
-            /*case 7:
-                listarTarefasAtrasadas(t, quantidadeTarefas);
+            case 7:
+                listarTarefasConcluidasComEAtrasadas(filaC);
                 break;
             case 8:
-                listarTarefasEmDia(t, quantidadeTarefas);
-                break;*/
-            case 9:
                 listarListaCompleta(fila);
                 break;
             case 0:
@@ -265,7 +262,7 @@ void atualizarStatus(Fila* fila, Lista* listaPendentes) {
             encontrou = 1;
 
             // Solicite ao usuário o novo status
-            printf("Digite o novo status (1 para atrasada, 0 em dia, -1 pendente): ");
+            printf("Digite o novo status ( 0 em dia, -1 pendente): ");
             scanf("%d", &novoStatus);
 
             // Atualize o status da tarefa
@@ -297,7 +294,7 @@ void atualizarStatus(Fila* fila, Lista* listaPendentes) {
         printf("Tarefa com codigo %d nao encontrada.\n", codigo);
     }
 }
-void TarefasPendentes(Fila*filaP){
+/*void TarefasPendentes(Fila*filaP){
 
     printf("Tarefas Pendentes:\n");
     No* atual = fila->ini;
@@ -309,9 +306,44 @@ void TarefasPendentes(Fila*filaP){
         atual = atual->prox;
     }
     printf("\n");
+}*/
+
+/*void TarefasPendentes(Lista* listaPendentes) {
+    printf("Tarefas Pendentes:\n");
+    No* atual = listaPendentes->ini; // Percorra a lista de tarefas pendentes
+
+    while (atual != NULL) {
+        printf("Código: %d, Nome: %s, Projeto: %s\n",
+               atual->info.codigo, atual->info.nome, atual->info.projeto);
+        atual = atual->prox;
+    }
+    printf("\n");
+}*/
+void TarefasPendentes(Fila* fila, Lista* listaPendentes) {
+    printf("Tarefas Pendentes:\n");
+
+    // Percorra a fila principal
+    No* atual = fila->ini;
+
+    while (atual != NULL) {
+        if (atual->info.status == -1) { // Tarefa pendente na fila principal
+            printf("Código: %d, Nome: %s, Projeto: %s\n",
+                   atual->info.codigo, atual->info.nome, atual->info.projeto);
+        }
+        atual = atual->prox;
+    }
+
+    // Percorra a lista de tarefas pendentes
+    atual = listaPendentes->ini;
+
+    while (atual != NULL) {
+        printf("Código: %d, Nome: %s, Projeto: %s\n",
+               atual->info.codigo, atual->info.nome, atual->info.projeto);
+        atual = atual->prox;
+    }
+
+    printf("\n");
 }
-
-
 
 void listarTarefasConcluidas(Fila* filaC) {
     printf("Tarefas Concluídas:\n");
@@ -327,13 +359,31 @@ void listarTarefasConcluidas(Fila* filaC) {
 }
 
 
-void listarTarefasAtrasadas(Tarefa tarefas[], int quantidade) {
-    // Adicionar código para listar tarefas atrasadas
+void listarTarefasConcluidasComEAtrasadas(Fila* filaC) {
+    printf("Tarefas Concluídas com Atraso:\n");
+    No* atual = filaC->ini;
+
+    while (atual != NULL) {
+        if (atual->info.status == 1) { // Tarefa concluída com atraso
+            printf("Código: %d, Nome: %s, Projeto: %s, Status: %d\n",
+                   atual->info.codigo, atual->info.nome, atual->info.projeto, atual->info.status);
+        }
+        atual = atual->prox;
+    }
+
+    printf("\nTarefas Concluídas sem Atraso:\n");
+    atual = filaC->ini;
+
+    while (atual != NULL) {
+        if (atual->info.status == 0) { // Tarefa concluída sem atraso
+            printf("Código: %d, Nome: %s, Projeto: %s, Status: %d\n",
+                   atual->info.codigo, atual->info.nome, atual->info.projeto, atual->info.status);
+        }
+        atual = atual->prox;
+    }
 }
 
-void listarTarefasEmDia(Tarefa tarefas[], int quantidade) {
-    // Adicionar código para listar tarefas em dia
-}
+
 void listarListaCompleta(Fila* fila) {
     No* atual = fila->ini;
 
