@@ -246,7 +246,7 @@ void concluirTarefa(Fila* fila, Fila* filaC) {
 
 
 
-void atualizarStatus(Fila* fila, Lista* listaPendentes) {
+/*void atualizarStatus(Fila* fila, Lista* listaPendentes) {
     int codigo, novoStatus;
 
     // Solicite ao usuário o código da tarefa que deseja modificar o status
@@ -272,6 +272,56 @@ void atualizarStatus(Fila* fila, Lista* listaPendentes) {
             if (novoStatus == -1) {
                 // Mova a tarefa para a lista de tarefas pendentes
                 InsereLista(listaPendentes, atual->info);
+                No* temp = atual;
+                atual = atual->prox;
+                free(temp);
+
+                // Atualize a fila principal
+                if (temp == fila->ini) {
+                    fila->ini = atual;
+                }
+            } else {
+                atual = atual->prox;
+            }
+
+            printf("Status da tarefa atualizado com sucesso!\n");
+            break;
+        }
+        atual = atual->prox;
+    }
+
+    if (!encontrou) {
+        printf("Tarefa com codigo %d nao encontrada.\n", codigo);
+    }
+}*/
+void atualizarStatus(Fila* fila, Lista* listaPendentes) {
+    int codigo, novoStatus;
+
+    // Solicite ao usuário o código da tarefa que deseja modificar o status
+    printf("Digite o codigo da tarefa que deseja modificar o status: ");
+    scanf("%d", &codigo);
+
+    No* atual = fila->ini;
+    int encontrou = 0;
+
+    // Percorra a fila procurando pela tarefa com o código fornecido
+    while (atual != NULL) {
+        if (atual->info.codigo == codigo) {
+            encontrou = 1;
+
+            // Solicite ao usuário o novo status
+            printf("Digite o novo status (1 para atrasada, 0 em dia, -1 pendente): ");
+            scanf("%d", &novoStatus);
+
+            // Atualize o status da tarefa
+            atual->info.status = novoStatus;
+
+            // Verifique se a tarefa se tornou pendente
+            if (novoStatus == -1) {
+                // Mova a tarefa para a lista de tarefas pendentes
+                InsereLista(listaPendentes, atual->info);
+
+                // Remova a tarefa da fila principal
                 No* temp = atual;
                 atual = atual->prox;
                 free(temp);
