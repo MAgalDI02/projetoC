@@ -9,16 +9,22 @@ Fila* fila;
 Fila* filaP;
 Fila* filaA;
 Fila* filaC;
+Fila* filaAlta;
+Fila* filaNormal;
+Fila* filaBaixa;
 Lista* listarTarefasPendentes;
 
 
 int main() {
-    fila = CriaFila();
-    filaP=CriaFila();
-    filaA=CriaFila();
-    filaC=CriaFila();
-    listarTarefasPendentes=CriaLista();
-    Tarefa tarefa[100];
+    filaAlta = CriaFila();
+    filaNormal = CriaFila();
+    filaBaixa = CriaFila();
+    fila = CriaFila(); //fila principal 
+    filaP=CriaFila();  //filas para tarefas pendentes
+    filaA=CriaFila();  //fila das tarefas atrasadas
+    filaC=CriaFila();  //fila das tarefas concluidas
+    listarTarefasPendentes=CriaLista(); //lista das onde a quando atualizar o status para pendente vai receber
+    Tarefa tarefa[100];    //vetor de tarefas 
 
     int quantidadeTarefas = 0;
 
@@ -36,6 +42,7 @@ int main() {
         printf("6. Listar Tarefas Concluidas\n");
         printf("7. Listar Tarefas Concluidas com e sem atraso\n");
         printf("8. Listar Todas as Tarefas\n");
+        printf("9. Listar Tarefas por Prioridade\n");
         printf("0. Sair\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
@@ -66,6 +73,9 @@ int main() {
             case 8:
                 listarListaCompleta(fila,listarTarefasPendentes);
                 break;
+            case 9:
+                listarTarefasPorPrioridade(); // Chama a função para listar tarefas por prioridade
+                break;
             case 0:
                 printf("Saindo...\n");
                 break;
@@ -74,6 +84,11 @@ int main() {
         }
     } while(opcao != 0);
 
+    filaAlta = liberaFila(filaAlta);
+    filaNormal = liberaFila(filaNormal);
+    filaBaixa = liberaFila(filaBaixa);
+  
+
     return 0;
 }
 
@@ -81,7 +96,6 @@ int main() {
 void adicionarTarefa(Fila* fila, int* quantidade) {
     Tarefa novaTarefa;
 
-    // Solicite ao usuário que insira os detalhes da nova tarefa
     printf("Digite o codigo da tarefa: ");
     scanf("%d", &novaTarefa.codigo);
 
@@ -95,7 +109,6 @@ void adicionarTarefa(Fila* fila, int* quantidade) {
         printf("Digite a data de inicio (dd mm aaaa): ");
         scanf("%d %d %d", &novaTarefa.inicio.dia, &novaTarefa.inicio.mes, &novaTarefa.inicio.ano);
 
-        // Verifique se a data de início é válida (não permita dia = 0)
         if (novaTarefa.inicio.dia <= 0 || novaTarefa.inicio.dia > 31 || novaTarefa.inicio.mes <= 0 || novaTarefa.inicio.mes > 12) {
             printf("Data de inicio invalida. Por favor, insira novamente.\n");
         }
@@ -104,22 +117,91 @@ void adicionarTarefa(Fila* fila, int* quantidade) {
     printf("Digite a data de termino (dd mm aaaa): ");
     scanf("%d %d %d", &novaTarefa.termino.dia, &novaTarefa.termino.mes, &novaTarefa.termino.ano);
 
-    // Verifique se a data de término é válida (não permita dia = 0)
     if (novaTarefa.termino.dia <= 0 || novaTarefa.termino.dia > 31 || novaTarefa.termino.mes <= 0 || novaTarefa.termino.mes > 12) {
         printf("Data de termino invalida. Por favor, insira novamente.\n");
-        return; // Saia da função se a data de término for inválida
+        return;
     }
 
     printf("Digite o status (1 para atrasada, 0 em dia, -1 pendente): ");
     scanf("%d", &novaTarefa.status);
 
-    // Insira a nova tarefa na fila
-    InsereFila(fila, novaTarefa);
+    printf("Insira a prioridade da tarefa (1 para Alta Prioridade, 2 para Prioridade Normal, 3 para Baixa Prioridade): ");
+    scanf("%d", &novaTarefa.prioridade);
+    if (novaTarefa.prioridade == 1) {
+        InsereFila(filaAlta, novaTarefa);
+    } else if (novaTarefa.prioridade == 2) {
+        InsereFila(filaNormal, novaTarefa);
+    } else if (novaTarefa.prioridade == 3) {
+        InsereFila(filaBaixa, novaTarefa);
+    } else {
+        printf("Prioridade inválida. Tarefa não adicionada.\n");
+        return;
+    }
 
-    // Atualize o contador de tarefas (*quantidade)
+    InsereFilaCorreta(fila, novaTarefa);
+
     (*quantidade)++;
 }
 
+void listarTarefasPorPrioridade() {
+    // A função utiliza as filas globais filaAlta, filaNormal e filaBaixa
+    // para listar as tarefas por prioridade.
+
+    Fila* filaAltaAux = CriaFila();
+    Fila* filaNormalAux = CriaFila();
+    Fila* filaBaixaAux = CriaFila();
+
+    // Percorra a fila de alta prioridade e insira na fila auxiliar
+    while (!VaziaFila(filaAlta)) {
+        Tarefa t = RetiraFila(filaAlta);
+        InsereFila(filaAltaAux, t);
+    }
+
+    // Percorra a fila de prioridade normal e insira na fila auxiliar
+    while (!VaziaFila(filaNormal)) {
+        Tarefa t = RetiraFila(filaNormal);
+        InsereFila(filaNormalAux, t);
+    }
+
+    // Percorra a fila de baixa prioridade e insira na fila auxiliar
+    while (!VaziaFila(filaBaixa)) {
+        Tarefa t = RetiraFila(filaBaixa);
+        InsereFila(filaBaixaAux, t);
+    }
+
+    // Imprima as tarefas por prioridade
+    printf("Tarefas por Prioridade (da mais alta para a mais baixa):\n");
+
+    printf("\nAlta Prioridade:\n");
+    imprimeFila(filaAltaAux);
+
+    printf("\nPrioridade Normal:\n");
+    imprimeFila(filaNormalAux);
+
+    printf("\nBaixa Prioridade:\n");
+    imprimeFila(filaBaixaAux);
+
+    // Restaure as filas originais
+    while (!VaziaFila(filaAltaAux)) {
+        Tarefa t = RetiraFila(filaAltaAux);
+        InsereFila(filaAlta, t);
+    }
+
+    while (!VaziaFila(filaNormalAux)) {
+        Tarefa t = RetiraFila(filaNormalAux);
+        InsereFila(filaNormal, t);
+    }
+
+    while (!VaziaFila(filaBaixaAux)) {
+        Tarefa t = RetiraFila(filaBaixaAux);
+        InsereFila(filaBaixa, t);
+    }
+
+    // Lembre-se de liberar as filas auxiliares
+    liberaFila(filaAltaAux);
+    liberaFila(filaNormalAux);
+    liberaFila(filaBaixaAux);
+}
 
 
 void modificarTarefa(Fila* fila,Lista *listaPendentes) {
