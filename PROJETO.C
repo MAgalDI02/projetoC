@@ -137,9 +137,6 @@ void adicionarTarefa(Fila* fila, int* quantidade) {
         printf("Prioridade inválida. Tarefa não adicionada.\n");
         return;
     }
-
-    InsereFilaCorreta(fila, novaTarefa);
-
     (*quantidade)++;
 }
 
