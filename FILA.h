@@ -18,6 +18,7 @@ typedef struct tarefa {
     Data inicio;
     Data termino;
     int status; // 1 para atrasada, 0 em dia, -1 pendente
+    int prioridade;
 } Tarefa;
 
 typedef struct nos {
