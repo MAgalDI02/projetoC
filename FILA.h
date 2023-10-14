@@ -26,10 +26,10 @@ typedef struct nos {
     struct nos* prox;
 } No;
 
-typedef struct lista {
-    No* ini;
-    No* fim;
-} Lista;
+typedef struct No {
+    Tarefa info;
+    struct No *prox;
+}Lista;
 
 typedef struct fila {
     No* ini;
@@ -86,7 +86,7 @@ void imprimeFila(Fila* f) {
     No* q;
     printf("\n\t\t");
     for (q = f->ini; q != NULL; q = q->prox) {
-        printf("Código: %d, Nome: %s, Projeto: %s, Status: %d - ", q->info.codigo, q->info.nome, q->info.projeto, q->info.status);
+        printf("Codigo: %d, Nome: %s, Projeto: %s, Status: %d , Prioridade: %d \n ", q->info.codigo, q->info.nome, q->info.projeto, q->info.status,q->info.prioridade);
     }
     printf("\n");
 }
@@ -105,52 +105,57 @@ Fila* liberaFila(Fila* f) {
 // Funções para manipular a lista de tarefas pendentes
 
 Lista* CriaLista() {
-    Lista* l = (Lista*)malloc(sizeof(Lista));
-    l->ini = l->fim = NULL;
-    return l;
+    return NULL;
 }
 
-void InsereLista(Lista*l, Tarefa t) {
-    No* novo = (No*)malloc(sizeof(No));
-    novo->info = t;
+Lista*  InsereFinal(Lista* p , Tarefa done) {
+
+
+    /*
+    Esta função insere informação do tipo Tarefa
+    de uma Fila e insere em uma Lista de Tarefas
+    Parâmetros: A lista que recebe a Tarefa,
+                A Tarefa em questão;
+    Não retorna nada.
+    */
+
+    //Criando espaço para novo nó.
+
+    No* novo;
+    novo = (No*)malloc(sizeof(No));
+    //Auxiliar receberá primeiro elemento
+
+    No* aux = p;
+
     novo->prox = NULL;
+    novo->info = done;
+    //Se fila estiver vazia, o novo elemento será o início da fila.
 
-    if (l->fim == NULL) {
-        l->ini = l->fim = novo;
-    } else {
-        l->fim->prox = novo;
-        l->fim = novo;
+    if(p == NULL){
+        p = novo;
+
     }
+    else {
+        //Se não estiver vazia, o novo nó será o último elemento.
+        while(aux->prox != NULL)
+        {
+            aux = aux->prox;
+        }
+        aux->prox = novo;
+    }
+
+
+    return p;
 }
 
-Tarefa RetiraLista(Lista*l) {
-    Tarefa t;
 
-    if (l->ini == NULL) {
-        printf("Lista vazia.\n");
-        // Você pode tratar o erro de outra maneira, se desejar.
-        exit(0);
-    }
-
-    t = l->ini->info;
-    No* temp = l->ini;
-
-    l->ini = l->ini->prox;
-    free(temp);
-
-    if (l->ini == NULL) {
-        l->fim = NULL;
-    }
-
-    return t;
-}
 
 void MoverPendentesParaLista(Fila* fila, Lista* lista) {
     No* atual = fila->ini;
 
     while (atual != NULL) {
         if (atual->info.status == -1) { // Tarefa pendente
-            InsereLista(lista, atual->info);
+            InsereFinal(lista, atual->info);
             No* temp = atual;
             atual = atual->prox;
             free(temp);
@@ -163,17 +168,5 @@ void MoverPendentesParaLista(Fila* fila, Lista* lista) {
     fila->ini = fila->fim = NULL;
 }
 
-void MoverListaParaPendentes(Fila* fila, Lista* lista) {
-    No* atual = lista->ini;
 
-    while (atual != NULL) {
-        InsereFila(fila, atual->info);
-        No* temp = atual;
-        atual = atual->prox;
-        free(temp);
-    }
-
-    // Atualize a lista de tarefas pendentes
-    lista->ini = lista->fim = NULL;
-}
 #endif // FILA_H_INCLUDED
